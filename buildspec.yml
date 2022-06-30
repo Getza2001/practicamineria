@@ -1,0 +1,55 @@
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12  
+    commands:
+     
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+      - npm install
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - REPOSITORY_URI=271488222648.dkr.ecr.us-east-1.amazonaws.com/practicamineria
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Compiling the Node.js code
+      - mocha test.js
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - printf '[{"name":"practicamineria","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json
+# Include only the files required for your application to run.
+# Do not use recursively include artifacts from node_modules directory as it will include unnecessary packages 
+# used only for building and testing.
+# ExpressJS apps will need other artifact directories included (bin/*, public/*, routes/*, views/* etc).
+artifacts:
+  files:
+    #no sean mamones y revisen su proyecto iono c como lo hicieron pero si tinene un index y un app js agreguenlos
+    # en resumen va lo mas importante por que en automatico reconoce routes, views, etc de un poryecto node
+    #a mi me funciono asi por que lo hice sencillo mi API asi que no me esten preguntando que va aqui eso experimentelo ustedes
+    #- app.js
+    #- index.html
+    - imagedefinitions.json
+    - routes/index.js
+    - package.json
+    - node_modules/async/*
+    - node_modules/lodash/*
+    - app.js
+    - Dockerfile
+    - package-lock.json
