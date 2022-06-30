@@ -10,7 +10,7 @@ router.get('/api', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  res.send('Practica mineria funciono')
+  res.send('Practica mineria funciono bien')
   
 });
 
