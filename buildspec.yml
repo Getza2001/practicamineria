@@ -5,6 +5,8 @@ phases:
   install:
     runtime-versions:
       nodejs: 12  
+    commands:
+     
   pre_build:
     commands:
       - echo Installing source NPM dependencies...
@@ -31,8 +33,17 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"practicamineria","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - cat imagedefinitions.json
+# Include only the files required for your application to run.
+# Do not use recursively include artifacts from node_modules directory as it will include unnecessary packages 
+# used only for building and testing.
+# ExpressJS apps will need other artifact directories included (bin/*, public/*, routes/*, views/* etc).
 artifacts:
   files:
+    #no sean mamones y revisen su proyecto iono c como lo hicieron pero si tinene un index y un app js agreguenlos
+    # en resumen va lo mas importante por que en automatico reconoce routes, views, etc de un poryecto node
+    #a mi me funciono asi por que lo hice sencillo mi API asi que no me esten preguntando que va aqui eso experimentelo ustedes
+    #- app.js
+    #- index.html
     - imagedefinitions.json
     - routes/index.js
     - package.json
@@ -40,4 +51,4 @@ artifacts:
     - node_modules/lodash/*
     - app.js
     - Dockerfile
-  
+    - package-lock.json
