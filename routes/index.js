@@ -9,4 +9,10 @@ router.get('/api', async (req, res) => {
   return res.json(data);
 });
 
+router.get('/', async (req, res) => {
+  res.send('Practica terminada')
+  
+});
+
+
 module.exports = router;
