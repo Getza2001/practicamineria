@@ -10,7 +10,7 @@ router.get('/api', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  res.send('Practica terminada')
+  res.send('Practica terminada nueva rama')
   
 });
 
